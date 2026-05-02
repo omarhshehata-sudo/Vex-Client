@@ -1,8 +1,9 @@
 import type { LauncherGlobalSettings } from './profiles/profilesStore';
 import type { LauncherProfile } from './profiles/profileTypes';
-import type { ModLoader } from './mods/modsTypes';
+import type { LauncherSettings, ModLoader } from '../shared/ipcTypes';
 
 export type { ModLoader };
+export type { LauncherSettings } from '../shared/ipcTypes';
 export type { LauncherGlobalSettings } from './profiles/profilesStore';
 export type { LauncherProfile } from './profiles/profileTypes';
 
@@ -25,55 +26,6 @@ export type LauncherAuthState = {
 	mcAccessToken: string;
 	mcExpiresAtEpochSec: number;
 	msRefreshToken: string;
-};
-
-/**
- * Merged view: active profile fields + global launcher settings.
- * Persisted separately (see `vex-launcher-profiles.json` + `vex-launcher-settings.json`).
- */
-export type LauncherSettings = {
-	ramMb: number;
-	javaPath: string;
-	gameDirectory: string;
-	resolutionWidth: number;
-	resolutionHeight: number;
-	fullscreen: boolean;
-	selectedVersionId: string | null;
-	/** When true, exit the launcher after a successful (simulated or real) game start. */
-	closeLauncherAfterGameStart: boolean;
-	/** Global extra JVM flags (after profile `profileExtraJvmArgs`). */
-	extraJvmArgs: string;
-	lastPlayedVersionId: string | null;
-	lastPlayedAtEpochSec: number | null;
-	/** Includes `vanilla`. */
-	selectedModLoader: ModLoader;
-	/** Active launcher profile UUID (mods + disk layout). */
-	selectedProfileId: string | null;
-	/** Same as `selectedProfileId` when a profile is active. */
-	launcherProfileId: string;
-	profileName: string;
-	loaderVersion: string;
-	profileIcon: string;
-	profileColor: string;
-	profileExtraJvmArgs: string;
-	/** Absolute override, or empty for default `<userData>/profiles/<id>/mods`. */
-	modsDirectory: string;
-	/** From global settings — persisted in `vex-launcher-settings.json`. */
-	language: string;
-	startOnBoot: boolean;
-	minimizeToTray: boolean;
-	checkForUpdates: boolean;
-	discordRichPresence: boolean;
-	theme: string;
-	accent: string;
-	animationsEnabled: boolean;
-	reduceMotion: boolean;
-	accentIntensity: 'subtle' | 'normal' | 'strong';
-	desktopNotifications: boolean;
-	updatePrompts: boolean;
-	newsHighlights: boolean;
-	parallelDownloads: boolean;
-	debugMode: boolean;
 };
 
 export const DEFAULT_SETTINGS: LauncherSettings = {
