@@ -2,19 +2,19 @@ package com.vexclient.client.mc.gui.widget;
 
 import com.vexclient.client.core.VexRenderUtils;
 import com.vexclient.client.core.VexTheme;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.network.chat.Component;
 
 /**
  * A professionally styled button widget for the Vex Client.
  * Features rounded corners, gradient backgrounds, hover animations, and glow effects.
  */
-public class VexButton extends ButtonWidget {
+public class VexButton extends Button {
 
 	public enum Style {
 		PRIMARY,    // Prominent purple button for main actions
@@ -27,42 +27,42 @@ public class VexButton extends ButtonWidget {
 	private float hoverAnimation = 0f;
 	private long lastRenderTime = 0;
 
-	public VexButton(int x, int y, int width, int height, Text message, PressAction onPress, Style style) {
-		super(x, y, width, height, message, onPress, DEFAULT_NARRATION_SUPPLIER);
+	public VexButton(int x, int y, int width, int height, Component message, OnPress onPress, Style style) {
+		super(x, y, width, height, message, onPress, DEFAULT_NARRATION);
 		this.style = style;
 	}
 
-	public VexButton(int x, int y, int width, int height, Text message, PressAction onPress) {
+	public VexButton(int x, int y, int width, int height, Component message, OnPress onPress) {
 		this(x, y, width, height, message, onPress, Style.SECONDARY);
 	}
 
 	/**
 	 * Builder for creating VexButtons with a fluent API.
 	 */
-	public static Builder builder(Text message, PressAction onPress) {
-		return new Builder(message, onPress);
+	public static VexButtonBuilder builder(Component message, OnPress onPress) {
+		return new VexButtonBuilder(message, onPress);
 	}
 
 	@Override
-	protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-		MinecraftClient client = MinecraftClient.getInstance();
-		TextRenderer textRenderer = client.textRenderer;
+	protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
+		Minecraft client = Minecraft.getInstance();
+		Font font = client.font;
 
 		// Update hover animation
 		updateHoverAnimation();
 
-		boolean hovered = isHovered();
-		boolean pressed = isHovered() && client.mouse.wasLeftButtonClicked();
+		boolean hovered = this.isHovered();
+		boolean pressed = hovered && client.mouseHandler.isLeftPressed();
 
 		// Get colors based on style and state
 		int bgColor = getBackgroundColor(hovered, pressed);
 		int borderColor = getBorderColor(hovered);
 		int textColor = getTextColor();
 
-		int x = getX();
-		int y = getY();
-		int width = getWidth();
-		int height = getHeight();
+		int x = this.getX();
+		int y = this.getY();
+		int width = this.getWidth();
+		int height = this.getHeight();
 		int radius = VexTheme.CORNER_RADIUS_MEDIUM;
 
 		// Draw drop shadow
@@ -96,8 +96,8 @@ public class VexButton extends ButtonWidget {
 		VexRenderUtils.drawRoundedRectOutline(context, x, y, width, height, radius, 1, borderColor);
 
 		// Draw text
-		String text = getMessage().getString();
-		int textWidth = textRenderer.getWidth(text);
+		String text = this.getMessage().getString();
+		int textWidth = font.width(text);
 		int textX = x + (width - textWidth) / 2;
 		int textY = y + (height - 8) / 2;
 
@@ -108,9 +108,9 @@ public class VexButton extends ButtonWidget {
 
 		// Draw text shadow for depth
 		if (this.active) {
-			context.drawText(textRenderer, text, textX + 1, textY + 1, VexTheme.withAlpha(0xFF000000, 80), false);
+			context.drawString(font, text, textX + 1, textY + 1, VexTheme.withAlpha(0xFF000000, 80), false);
 		}
-		context.drawText(textRenderer, text, textX, textY, this.active ? textColor : VexTheme.TEXT_MUTED, false);
+		context.drawString(font, text, textX, textY, this.active ? textColor : VexTheme.TEXT_MUTED, false);
 	}
 
 	private void updateHoverAnimation() {
@@ -169,50 +169,41 @@ public class VexButton extends ButtonWidget {
 		};
 	}
 
-	@Override
-	public void onClick(double mouseX, double mouseY) {
-		super.onClick(mouseX, mouseY);
-		// Play a softer click sound
-		MinecraftClient.getInstance().getSoundManager().play(
-				PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F)
-		);
-	}
-
 	/**
 	 * Fluent builder for VexButton.
 	 */
-	public static class Builder {
-		private final Text message;
-		private final PressAction onPress;
+	public static class VexButtonBuilder {
+		private final Component message;
+		private final OnPress onPress;
 		private int x = 0;
 		private int y = 0;
 		private int width = 100;
 		private int height = 20;
 		private Style style = Style.SECONDARY;
 
-		public Builder(Text message, PressAction onPress) {
+		public VexButtonBuilder(Component message, OnPress onPress) {
 			this.message = message;
 			this.onPress = onPress;
 		}
 
-		public Builder position(int x, int y) {
+		public VexButtonBuilder position(int x, int y) {
 			this.x = x;
 			this.y = y;
 			return this;
 		}
 
-		public Builder size(int width, int height) {
+		public VexButtonBuilder size(int width, int height) {
 			this.width = width;
 			this.height = height;
 			return this;
 		}
 
-		public Builder width(int width) {
+		public VexButtonBuilder width(int width) {
 			this.width = width;
 			return this;
 		}
 
-		public Builder style(Style style) {
+		public VexButtonBuilder style(Style style) {
 			this.style = style;
 			return this;
 		}

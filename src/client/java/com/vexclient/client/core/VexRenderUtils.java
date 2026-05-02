@@ -1,6 +1,7 @@
 package com.vexclient.client.core;
 
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.Font;
 
 /**
  * Professional rendering utilities for the Vex Client UI.
@@ -26,7 +27,7 @@ public final class VexRenderUtils {
 	 * @param radius       Corner radius
 	 * @param color        Fill color (ARGB)
 	 */
-	public static void fillRoundedRect(DrawContext context, int x, int y, int width, int height, int radius, int color) {
+	public static void fillRoundedRect(GuiGraphics context, int x, int y, int width, int height, int radius, int color) {
 		radius = Math.min(radius, Math.min(width, height) / 2);
 
 		// Main center rectangle (without corners)
@@ -55,7 +56,7 @@ public final class VexRenderUtils {
 	 * @param borderWidth  Width of the border
 	 * @param color        Border color (ARGB)
 	 */
-	public static void drawRoundedRectOutline(DrawContext context, int x, int y, int width, int height, int radius, int borderWidth, int color) {
+	public static void drawRoundedRectOutline(GuiGraphics context, int x, int y, int width, int height, int radius, int borderWidth, int color) {
 		radius = Math.min(radius, Math.min(width, height) / 2);
 
 		// Top edge
@@ -77,7 +78,7 @@ public final class VexRenderUtils {
 	/**
 	 * Draws a filled rounded rectangle with a border.
 	 */
-	public static void fillRoundedRectWithBorder(DrawContext context, int x, int y, int width, int height, int radius, int fillColor, int borderColor) {
+	public static void fillRoundedRectWithBorder(GuiGraphics context, int x, int y, int width, int height, int radius, int fillColor, int borderColor) {
 		fillRoundedRect(context, x, y, width, height, radius, fillColor);
 		drawRoundedRectOutline(context, x, y, width, height, radius, 1, borderColor);
 	}
@@ -97,7 +98,7 @@ public final class VexRenderUtils {
 	 * @param colorTop  Color at the top (ARGB)
 	 * @param colorBottom Color at the bottom (ARGB)
 	 */
-	public static void fillVerticalGradient(DrawContext context, int x, int y, int width, int height, int colorTop, int colorBottom) {
+	public static void fillVerticalGradient(GuiGraphics context, int x, int y, int width, int height, int colorTop, int colorBottom) {
 		int steps = Math.min(height, 32);
 		int stepHeight = height / steps;
 
@@ -113,7 +114,7 @@ public final class VexRenderUtils {
 	/**
 	 * Draws a horizontal gradient rectangle.
 	 */
-	public static void fillHorizontalGradient(DrawContext context, int x, int y, int width, int height, int colorLeft, int colorRight) {
+	public static void fillHorizontalGradient(GuiGraphics context, int x, int y, int width, int height, int colorLeft, int colorRight) {
 		int steps = Math.min(width, 32);
 		int stepWidth = width / steps;
 
@@ -141,7 +142,7 @@ public final class VexRenderUtils {
 	 * @param glowSize   Size of the glow effect
 	 * @param glowColor  Base glow color (alpha will be modulated)
 	 */
-	public static void drawGlow(DrawContext context, int x, int y, int width, int height, int glowSize, int glowColor) {
+	public static void drawGlow(GuiGraphics context, int x, int y, int width, int height, int glowSize, int glowColor) {
 		int baseAlpha = VexTheme.getAlpha(glowColor);
 
 		for (int i = glowSize; i > 0; i--) {
@@ -169,7 +170,7 @@ public final class VexRenderUtils {
 	 * @param offsetX     Horizontal offset
 	 * @param offsetY     Vertical offset
 	 */
-	public static void drawDropShadow(DrawContext context, int x, int y, int width, int height, int shadowSize, int offsetX, int offsetY) {
+	public static void drawDropShadow(GuiGraphics context, int x, int y, int width, int height, int shadowSize, int offsetX, int offsetY) {
 		int shadowX = x + offsetX;
 		int shadowY = y + offsetY;
 
@@ -198,7 +199,7 @@ public final class VexRenderUtils {
 	 * @param isOn     Current toggle state
 	 * @param hoverProgress Animation progress for hover (0.0 - 1.0)
 	 */
-	public static void drawToggleSwitch(DrawContext context, int x, int y, int width, int height, boolean isOn, float hoverProgress) {
+	public static void drawToggleSwitch(GuiGraphics context, int x, int y, int width, int height, boolean isOn, float hoverProgress) {
 		int trackRadius = height / 2;
 		int knobSize = height - 4;
 		int knobRadius = knobSize / 2;
@@ -236,7 +237,7 @@ public final class VexRenderUtils {
 	 * @param bgColor    Background color
 	 * @param fillColor  Fill color
 	 */
-	public static void drawProgressBar(DrawContext context, int x, int y, int width, int height, float progress, int bgColor, int fillColor) {
+	public static void drawProgressBar(GuiGraphics context, int x, int y, int width, int height, float progress, int bgColor, int fillColor) {
 		int radius = height / 2;
 
 		// Background
@@ -252,7 +253,7 @@ public final class VexRenderUtils {
 	/**
 	 * Draws a separator line.
 	 */
-	public static void drawSeparator(DrawContext context, int x, int y, int width, int color) {
+	public static void drawSeparator(GuiGraphics context, int x, int y, int width, int color) {
 		fillHorizontalGradient(context, x, y, width / 2, 1, VexTheme.withAlpha(color, 0), color);
 		fillHorizontalGradient(context, x + width / 2, y, width / 2, 1, color, VexTheme.withAlpha(color, 0));
 	}
@@ -260,13 +261,13 @@ public final class VexRenderUtils {
 	/**
 	 * Draws a badge/pill shape.
 	 */
-	public static void drawBadge(DrawContext context, int x, int y, int width, int height, int bgColor, int textColor, String text, net.minecraft.client.font.TextRenderer textRenderer) {
+	public static void drawBadge(GuiGraphics context, int x, int y, int width, int height, int bgColor, int textColor, String text, Font font) {
 		int radius = height / 2;
 		fillRoundedRect(context, x, y, width, height, radius, bgColor);
 
-		int textX = x + (width - textRenderer.getWidth(text)) / 2;
+		int textX = x + (width - font.width(text)) / 2;
 		int textY = y + (height - 8) / 2;
-		context.drawText(textRenderer, text, textX, textY, textColor, false);
+		context.drawString(font, text, textX, textY, textColor, false);
 	}
 
 	// ──────────────────────────────────────────────────────────────
@@ -277,7 +278,7 @@ public final class VexRenderUtils {
 		TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT
 	}
 
-	private static void drawCorner(DrawContext context, int x, int y, int radius, int color, Corner corner) {
+	private static void drawCorner(GuiGraphics context, int x, int y, int radius, int color, Corner corner) {
 		for (int i = 0; i < radius; i++) {
 			for (int j = 0; j < radius; j++) {
 				float dx = 0, dy = 0;
@@ -296,7 +297,7 @@ public final class VexRenderUtils {
 		}
 	}
 
-	private static void drawCornerOutline(DrawContext context, int x, int y, int radius, int borderWidth, int color, Corner corner) {
+	private static void drawCornerOutline(GuiGraphics context, int x, int y, int radius, int borderWidth, int color, Corner corner) {
 		for (int i = 0; i < radius; i++) {
 			for (int j = 0; j < radius; j++) {
 				float dx = 0, dy = 0;
