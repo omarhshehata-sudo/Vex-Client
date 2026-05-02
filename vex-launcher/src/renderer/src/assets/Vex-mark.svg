@@ -1,0 +1,139 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>Vex Mark</title>
+  <desc>Transparent purple angular Vex client mark.</desc>
+
+  <defs>
+    <linearGradient id="outerGradient" x1="256" y1="56" x2="256" y2="455" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#C85CFF"/>
+      <stop offset="0.34" stop-color="#9A38F2"/>
+      <stop offset="0.72" stop-color="#6320C8"/>
+      <stop offset="1" stop-color="#2B0B78"/>
+    </linearGradient>
+
+    <linearGradient id="leftFacet" x1="102" y1="64" x2="274" y2="433" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#D66BFF"/>
+      <stop offset="0.48" stop-color="#8E35EF"/>
+      <stop offset="1" stop-color="#3A0D9D"/>
+    </linearGradient>
+
+    <linearGradient id="rightFacet" x1="410" y1="64" x2="238" y2="433" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#B94DFF"/>
+      <stop offset="0.5" stop-color="#7C2BE5"/>
+      <stop offset="1" stop-color="#33098E"/>
+    </linearGradient>
+
+    <linearGradient id="innerDark" x1="256" y1="158" x2="256" y2="399" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7A2AE4"/>
+      <stop offset="0.55" stop-color="#4E16B4"/>
+      <stop offset="1" stop-color="#1D064F"/>
+    </linearGradient>
+
+    <linearGradient id="edgeHighlight" x1="256" y1="58" x2="256" y2="453" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#E08CFF" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#A244FF" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#2B0B78" stop-opacity="0.2"/>
+    </linearGradient>
+
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="125%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#160033" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <!-- Main silhouette -->
+  <path
+    filter="url(#softShadow)"
+    d="M62 67
+       L205 162
+       L151 162
+       L256 455
+       L361 162
+       L307 162
+       L450 67
+       L288 317
+       L256 386
+       L224 317
+       Z"
+    fill="url(#outerGradient)"/>
+
+  <!-- Left bright outer plane -->
+  <path
+    d="M62 67
+       L205 162
+       L151 162
+       L256 455
+       L224 317
+       Z"
+    fill="url(#leftFacet)"/>
+
+  <!-- Right outer plane -->
+  <path
+    d="M450 67
+       L307 162
+       L361 162
+       L256 455
+       L288 317
+       Z"
+    fill="url(#rightFacet)"/>
+
+  <!-- Left inner bevel / shadow plane -->
+  <path
+    d="M151 162
+       L209 202
+       L256 386
+       L224 317
+       Z"
+    fill="url(#innerDark)"
+    opacity="0.88"/>
+
+  <!-- Right inner bevel / shadow plane -->
+  <path
+    d="M361 162
+       L303 202
+       L256 386
+       L288 317
+       Z"
+    fill="url(#innerDark)"
+    opacity="0.78"/>
+
+  <!-- Center lower dark triangular depth -->
+  <path
+    d="M224 317
+       L256 386
+       L288 317
+       L256 455
+       Z"
+    fill="#260765"
+    opacity="0.58"/>
+
+  <!-- Thin highlight along outer top edges -->
+  <path
+    d="M62 67
+       L205 162
+       L151 162
+       M450 67
+       L307 162
+       L361 162"
+    stroke="#D983FF"
+    stroke-opacity="0.48"
+    stroke-width="5"
+    stroke-linejoin="round"
+    stroke-linecap="round"/>
+
+  <!-- Subtle full outline highlight -->
+  <path
+    d="M62 67
+       L205 162
+       L151 162
+       L256 455
+       L361 162
+       L307 162
+       L450 67
+       L288 317
+       L256 386
+       L224 317
+       Z"
+    stroke="url(#edgeHighlight)"
+    stroke-width="4"
+    stroke-linejoin="round"
+    fill="none"/>
+</svg>

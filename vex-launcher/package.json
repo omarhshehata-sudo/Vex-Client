@@ -1,0 +1,33 @@
+{
+  "name": "vex-launcher",
+  "version": "0.1.0-alpha",
+  "homepage": "https://vex-client.bolt.host/#download",
+  "private": true,
+  "type": "module",
+  "description": "Vex Launcher — desktop app (alpha). Run: npm install && npm run dev",
+  "main": "out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev .",
+    "build": "electron-vite build .",
+    "preview": "electron-vite preview ."
+  },
+  "dependencies": {
+    "fflate": "^0.8.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.1.1",
+    "zustand": "^5.0.12"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "electron": "^33.2.1",
+    "electron-vite": "^2.3.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "typescript": "~5.6.3",
+    "vite": "^5.4.11"
+  }
+}

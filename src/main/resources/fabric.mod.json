@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "vexclient",
+  "version": "${version}",
+  "name": "Vex Client",
+  "description": "Legitimate quality-of-life client utilities (alpha). Server-safe QoL overlays and settings.",
+  "authors": [
+    "Vex Client"
+  ],
+  "contact": {
+    "homepage": "https://vex-client.bolt.host/#download",
+    "sources": "https://vex-client.bolt.host/#download"
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/vexclient/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.vexclient.VexClient"
+    ],
+    "client": [
+      "com.vexclient.client.VexClientClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.2",
+    "minecraft": "~1.21.4",
+    "java": ">=21",
+    "fabric-api": "*"
+  },
+  "mixins": [
+    {
+      "config": "vexclient.client.mixins.json",
+      "environment": "client"
+    }
+  ]
+}

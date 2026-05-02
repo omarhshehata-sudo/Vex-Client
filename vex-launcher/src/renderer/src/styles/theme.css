@@ -1,0 +1,35 @@
+:root {
+	/* Vex premium dark system (Settings redesign spec) */
+	--vex-bg: #0b0b0f;
+	--vex-surface: #14141a;
+	--vex-surface-2: #1b1b23;
+	--vex-raised: #22222c;
+
+	--vex-accent: #7c5cff;
+	--vex-accent-hover: #8b73ff;
+	--vex-accent-pressed: #6848e8;
+	--vex-glow: rgba(124, 92, 255, 0.35);
+
+	--vex-text: #ffffff;
+	--vex-dim: #a6a6b3;
+	--vex-muted: #6f6f7c;
+
+	--vex-border: rgba(255, 255, 255, 0.08);
+
+	--vex-danger: #ff4d5e;
+	--vex-warning: #ffcc66;
+	--vex-success: #4dff9a;
+
+	--vex-radius: 16px;
+	--vex-radius-lg: 18px;
+
+	/* Snappy “premium UI” easing — fast out, soft landing */
+	--vex-ease: cubic-bezier(0.22, 1, 0.36, 1);
+	--vex-ease-in-out: cubic-bezier(0.45, 0, 0.2, 1);
+	--vex-tap-ms: 85ms;
+	--vex-ui-ms: 145ms;
+	/** Panels, route shells, larger layout shifts */
+	--vex-ui-slow-ms: 260ms;
+	/** Tiny affordances (badges, dots) */
+	--vex-ui-xs-ms: 100ms;
+}

@@ -1,0 +1,1257 @@
+@import './styles/theme.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+	color-scheme: dark;
+}
+
+html:not(.vex-motion-off) {
+	scroll-behavior: smooth;
+}
+html.vex-motion-off {
+	scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto !important;
+	}
+}
+
+body {
+	@apply m-0 min-h-screen antialiased text-vex-text;
+	font-family:
+		Inter,
+		Satoshi,
+		'SF Pro Display',
+		ui-sans-serif,
+		system-ui,
+		-apple-system,
+		'Segoe UI',
+		Roboto,
+		'Helvetica Neue',
+		Arial,
+		sans-serif;
+	background-color: var(--vex-bg);
+}
+
+#root {
+	@apply min-h-screen;
+}
+
+/*
+ * Default motion on interactive controls + data rows. Component utilities can override.
+ * Disabled under `html.vex-motion-off` and `prefers-reduced-motion: reduce`.
+ */
+html:not(.vex-motion-off) :where(
+	button,
+	[role='button'],
+	[role='tab'],
+	[role='menuitem'],
+	[role='option'],
+	[role='switch'],
+	[role='link'],
+	a[href],
+	summary,
+	select,
+	textarea,
+	input:not([type='hidden']):not([type='range']):not([type='file']):not([type='color']):not([type='checkbox']):not([type='radio'])
+) {
+	transition-property: color, background-color, border-color, outline-color, box-shadow, text-shadow, opacity, transform, filter,
+		backdrop-filter;
+	transition-duration: var(--vex-ui-ms);
+	transition-timing-function: var(--vex-ease);
+}
+
+html:not(.vex-motion-off) :where(input[type='checkbox'], input[type='radio']) {
+	transition-property: background-color, border-color, box-shadow, opacity, outline-color, filter;
+	transition-duration: var(--vex-ui-ms);
+	transition-timing-function: var(--vex-ease);
+}
+
+html:not(.vex-motion-off) :where(tbody tr, thead th) {
+	transition-property: background-color, color, border-color, box-shadow, opacity;
+	transition-duration: var(--vex-ui-ms);
+	transition-timing-function: var(--vex-ease);
+}
+
+html.vex-motion-off :where(
+	button,
+	[role='button'],
+	[role='tab'],
+	[role='menuitem'],
+	[role='option'],
+	[role='switch'],
+	[role='link'],
+	a[href],
+	summary,
+	select,
+	textarea,
+	input:not([type='hidden']):not([type='range']):not([type='file']):not([type='color']),
+	input[type='checkbox'],
+	input[type='radio'],
+	tbody tr,
+	thead th
+) {
+	transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:where(
+		button,
+		[role='button'],
+		[role='tab'],
+		[role='menuitem'],
+		[role='option'],
+		[role='switch'],
+		[role='link'],
+		a[href],
+		summary,
+		select,
+		textarea,
+		input:not([type='hidden']):not([type='range']):not([type='file']):not([type='color']),
+		input[type='checkbox'],
+		input[type='radio'],
+		tbody tr,
+		thead th
+	) {
+		transition: none !important;
+	}
+}
+
+/* Bordered surfaces (panels, cards) — subtle polish without animating “everything” blindly */
+html:not(.vex-motion-off) .vex-surface-animate {
+	transition-property: box-shadow, border-color, background-color, transform, opacity, filter, backdrop-filter;
+	transition-duration: var(--vex-ui-slow-ms);
+	transition-timing-function: var(--vex-ease);
+}
+html.vex-motion-off .vex-surface-animate,
+@media (prefers-reduced-motion: reduce) {
+	.vex-surface-animate {
+		transition: none !important;
+	}
+}
+
+/**
+ * Primary scroll surfaces: momentum-friendly, contained overscroll, compositor layer.
+ * Pair with `html:not(.vex-motion-off)` smooth scroll; disabled under `.vex-motion-off` / reduced-motion.
+ */
+.vex-app-scroll {
+	-webkit-overflow-scrolling: touch;
+	overscroll-behavior: contain;
+	transform: translateZ(0);
+	backface-visibility: hidden;
+}
+html:not(.vex-motion-off) .vex-app-scroll {
+	scroll-behavior: smooth;
+}
+html.vex-motion-off .vex-app-scroll {
+	scroll-behavior: auto !important;
+}
+@media (prefers-reduced-motion: reduce) {
+	.vex-app-scroll {
+		scroll-behavior: auto !important;
+	}
+}
+
+.vex-drag {
+	-webkit-app-region: drag;
+	app-region: drag;
+}
+
+.vex-no-drag {
+	-webkit-app-region: no-drag;
+	app-region: no-drag;
+}
+
+.vex-hover-lift {
+	transition-property: transform, box-shadow, background-color, border-color, opacity, filter;
+	transition-duration: var(--vex-ui-ms);
+	transition-timing-function: var(--vex-ease);
+	transform: translate3d(0, 0, 0);
+}
+.vex-hover-lift:hover {
+	@apply -translate-y-0.5 shadow-vex;
+}
+
+.vex-press {
+	transition-property: transform, box-shadow, background-color, border-color, opacity, filter, backdrop-filter;
+	transition-duration: var(--vex-ui-ms);
+	transition-timing-function: var(--vex-ease);
+	transform: translate3d(0, 0, 0);
+	backface-visibility: hidden;
+}
+/* Use filter instead of transform so Tailwind hover translates on buttons still compose. */
+.vex-press:active:not(:disabled) {
+	filter: brightness(0.93) saturate(0.98);
+	transition-duration: var(--vex-tap-ms);
+}
+
+.vex-card {
+	transition-property: transform, box-shadow, background-color, border-color, opacity, filter;
+	transition-duration: var(--vex-ui-ms);
+	transition-timing-function: var(--vex-ease);
+	transform: translate3d(0, 0, 0);
+}
+.vex-card:hover {
+	transform: translate3d(0, -2px, 0);
+	box-shadow: 0 0 48px -10px rgba(124, 92, 255, 0.22), 0 18px 60px rgba(0, 0, 0, 0.55);
+}
+
+.vex-glow-hover {
+	transition-property: transform, box-shadow, background-color, border-color, opacity, filter;
+	transition-duration: var(--vex-ui-ms);
+	transition-timing-function: var(--vex-ease);
+}
+.vex-glow-hover:hover {
+	box-shadow: 0 0 36px -12px rgba(124, 92, 255, 0.55);
+}
+
+@keyframes vexFadeIn {
+	from {
+		opacity: 0;
+		transform: translate3d(0, 8px, 0);
+	}
+	to {
+		opacity: 1;
+		transform: translate3d(0, 0, 0);
+	}
+}
+.vex-fade-in {
+	animation: vexFadeIn var(--vex-ui-slow-ms) var(--vex-ease) both;
+}
+
+@keyframes vexRouteEnter {
+	from {
+		opacity: 0;
+		transform: translate3d(0, 12px, 0);
+	}
+	to {
+		opacity: 1;
+		transform: translate3d(0, 0, 0);
+	}
+}
+.vex-route-enter {
+	animation: vexRouteEnter var(--vex-ui-slow-ms) var(--vex-ease) both;
+}
+
+@keyframes vexNavActiveLine {
+	from {
+		opacity: 0.45;
+		transform: scaleX(0.28);
+	}
+	to {
+		opacity: 1;
+		transform: scaleX(1);
+	}
+}
+html:not(.vex-motion-off) .vex-nav-active-line {
+	animation: vexNavActiveLine var(--vex-ui-slow-ms) var(--vex-ease) both;
+	transform-origin: left center;
+}
+
+@keyframes vexNewsDropdownIn {
+	from {
+		opacity: 0;
+		transform: translateY(-6px) scale(0.985);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+.vex-news-dropdown {
+	animation: vexNewsDropdownIn 220ms var(--vex-ease) both;
+	transform-origin: top right;
+}
+
+/* Horizontal version row (VersionSelector): staggered card entrance */
+@keyframes vexVersionRowCardIn {
+	from {
+		opacity: 0;
+		transform: translate3d(18px, 8px, 0) scale(0.93);
+	}
+	to {
+		opacity: 1;
+		transform: translate3d(0, 0, 0) scale(1);
+	}
+}
+.vex-version-row-card-in {
+	animation: vexVersionRowCardIn 420ms var(--vex-ease) both;
+	transform-origin: center bottom;
+}
+
+/* Play page VersionCarousel: first paint */
+@keyframes vexPlayVcarouselEnter {
+	from {
+		opacity: 0;
+		transform: translate3d(0, 14px, 0);
+	}
+	to {
+		opacity: 1;
+		transform: translate3d(0, 0, 0);
+	}
+}
+.vex-play-vcarousel-enter {
+	animation: vexPlayVcarouselEnter 440ms var(--vex-ease) both;
+}
+
+/* Premium version modal: carousel deck fades / lifts in with the panel */
+@keyframes vexVselCarouselTrackEnter {
+	from {
+		opacity: 0;
+		transform: translate3d(0, 16px, 0);
+	}
+	to {
+		opacity: 1;
+		transform: translate3d(0, 0, 0);
+	}
+}
+html:not(.vex-motion-off) .vex-vsel-root.vex-vsel-open .vex-vsel-carousel-track {
+	animation: vexVselCarouselTrackEnter 420ms var(--vex-ease) both;
+}
+
+.vex-ease {
+	transition-timing-function: var(--vex-ease);
+}
+
+/* General / Appearance: “Animations” off or “Reduce motion” — keep layout, drop long motion. */
+html.vex-motion-off *,
+html.vex-motion-off *::before,
+html.vex-motion-off *::after {
+	animation-duration: 0.001ms !important;
+	animation-iteration-count: 1 !important;
+	scroll-behavior: auto !important;
+}
+html.vex-motion-off .vex-route-enter,
+html.vex-motion-off .vex-settings-swap-out,
+html.vex-motion-off .vex-settings-swap-in,
+html.vex-motion-off .vex-version-row-card-in,
+html.vex-motion-off .vex-vsel-carousel-track,
+html.vex-motion-off .vex-play-vcarousel-enter {
+	opacity: 1 !important;
+	transform: none !important;
+}
+html.vex-motion-off .vex-nav-active-line {
+	animation: none !important;
+	opacity: 1 !important;
+	transform: none !important;
+}
+
+@keyframes vexShimmer {
+	0% {
+		background-position: 0% 0%;
+	}
+	100% {
+		background-position: -200% 0%;
+	}
+}
+.vex-skeleton {
+	background: linear-gradient(90deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06));
+	background-size: 200% 100%;
+	animation: vexShimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes vexAmbientShift {
+	0% {
+		background-position: 0% 0%;
+	}
+	100% {
+		background-position: 120% 0%;
+	}
+}
+.vex-ambient-bg {
+	background:
+		radial-gradient(800px 520px at 50% 38%, rgba(124, 92, 255, 0.12), transparent 62%),
+		linear-gradient(180deg, #11111a, #0b0b0f);
+	background-size: 180% 180%;
+	animation: vexAmbientShift 16s ease-in-out infinite alternate;
+}
+.vex-vignette {
+	background: radial-gradient(ellipse 120% 90% at 50% 15%, transparent 35%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+@keyframes vexToastIn {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes vexShineSweep {
+	0% {
+		transform: translateX(-140%) skewX(-18deg);
+		opacity: 0;
+	}
+	20% {
+		opacity: 0.35;
+	}
+	50% {
+		opacity: 0.18;
+	}
+	100% {
+		transform: translateX(140%) skewX(-18deg);
+		opacity: 0;
+	}
+}
+.vex-shine {
+	animation: vexShineSweep 2.8s var(--vex-ease) infinite;
+}
+
+@keyframes vexPlayPulse {
+	0% {
+		opacity: 0.18;
+		transform: translate(-50%, -50%) scale(0.98);
+	}
+	50% {
+		opacity: 0.22;
+		transform: translate(-50%, -50%) scale(1.01);
+	}
+	100% {
+		opacity: 0.18;
+		transform: translate(-50%, -50%) scale(0.98);
+	}
+}
+.vex-play-glow {
+	animation: vexPlayPulse 2.8s var(--vex-ease) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+	.vex-play-glow {
+		animation: none;
+	}
+	.vex-nav-active-line {
+		animation: none !important;
+	}
+	.vex-route-enter,
+	.vex-news-dropdown,
+	.vex-version-row-card-in,
+	.vex-play-vcarousel-enter,
+	.vex-vsel-root .vex-vsel-carousel-track {
+		animation: none !important;
+	}
+}
+
+@keyframes vexHomeGlowDrift {
+	0% {
+		transform: translate(-50%, -50%) translateY(-4px) scale(0.995);
+		opacity: 0.6;
+	}
+	100% {
+		transform: translate(-50%, -50%) translateY(4px) scale(1.01);
+		opacity: 0.75;
+	}
+}
+.vex-home-glow-drift {
+	animation: vexHomeGlowDrift 10s var(--vex-ease) infinite alternate;
+}
+
+@keyframes vexHeroEnter {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+.vex-hero-step {
+	animation: vexHeroEnter 260ms var(--vex-ease) both;
+	animation-delay: var(--vex-delay, 0ms);
+	will-change: transform, opacity;
+}
+
+@keyframes vexCheckGlow {
+	0% {
+		opacity: 0;
+		transform: scale(0.9);
+		filter: drop-shadow(0 0 0 rgba(77, 255, 154, 0));
+	}
+	60% {
+		opacity: 1;
+		transform: scale(1.05);
+		filter: drop-shadow(0 0 10px rgba(77, 255, 154, 0.65));
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1);
+		filter: drop-shadow(0 0 0 rgba(77, 255, 154, 0));
+	}
+}
+.vex-check-glow {
+	animation: vexCheckGlow 520ms var(--vex-ease) both;
+	animation-delay: var(--vex-delay, 0ms);
+}
+
+@keyframes vexNewsIn {
+	from {
+		opacity: 0;
+		transform: translateX(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+.vex-news-card-in {
+	animation: vexNewsIn 260ms var(--vex-ease) both;
+	animation-delay: var(--vex-delay, 0ms);
+	will-change: transform, opacity;
+}
+
+@keyframes vexPlayBtnIdleBreath {
+	0%,
+	100% {
+		box-shadow:
+			0 14px 44px rgba(124, 92, 255, 0.38),
+			0 0 48px rgba(124, 92, 255, 0.22);
+		filter: brightness(1);
+	}
+	50% {
+		box-shadow:
+			0 16px 50px rgba(124, 92, 255, 0.46),
+			0 0 62px rgba(124, 92, 255, 0.3);
+		filter: brightness(1.04);
+	}
+}
+
+@keyframes vexPlayAuraBreath {
+	0%,
+	100% {
+		opacity: 0.55;
+		transform: scale(1);
+		filter: blur(22px);
+	}
+	50% {
+		opacity: 0.88;
+		transform: scale(1.06);
+		filter: blur(28px);
+	}
+}
+
+.vex-play-wrap-idle .vex-play-aura {
+	animation: vexPlayAuraBreath 3.4s var(--vex-ease) infinite;
+}
+
+.vex-play-btn-idle {
+	animation: vexPlayBtnIdleBreath 2.9s var(--vex-ease) infinite;
+}
+
+@keyframes vexPlayLoadingSweep {
+	0% {
+		transform: translateX(-120%);
+	}
+	100% {
+		transform: translateX(260%);
+	}
+}
+
+.vex-play-loading-sweep {
+	background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+	animation: vexPlayLoadingSweep 1.25s linear infinite;
+	opacity: 0.55;
+	will-change: transform;
+}
+
+@keyframes vexPlayRipple {
+	0% {
+		transform: translate(-50%, -50%) scale(0.25);
+		opacity: 0.45;
+	}
+	100% {
+		transform: translate(-50%, -50%) scale(2.1);
+		opacity: 0;
+	}
+}
+
+.vex-play-ripple {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 140%;
+	height: 160%;
+	border-radius: 999px;
+	background: radial-gradient(circle, rgba(255, 255, 255, 0.38), transparent 62%);
+	animation: vexPlayRipple 520ms var(--vex-ease) forwards;
+	z-index: 3;
+	pointer-events: none;
+}
+
+@keyframes vexShineHover {
+	0% {
+		transform: translateX(-160%) skewX(-18deg);
+		opacity: 0;
+	}
+	35% {
+		opacity: 0.22;
+	}
+	100% {
+		transform: translateX(160%) skewX(-18deg);
+		opacity: 0;
+	}
+}
+.vex-play-shine {
+	opacity: 0;
+}
+.vex-play-btn:hover .vex-play-shine {
+	opacity: 1;
+	animation: vexShineHover 780ms var(--vex-ease) both;
+}
+
+/* Version selector modal (open / close) */
+.vex-vsel-root .vex-vsel-overlay {
+	opacity: 0;
+	backdrop-filter: blur(0px);
+	transition:
+		opacity 260ms var(--vex-ease),
+		backdrop-filter 260ms var(--vex-ease);
+}
+.vex-vsel-root.vex-vsel-open .vex-vsel-overlay {
+	opacity: 1;
+	backdrop-filter: blur(14px);
+}
+
+/* Panel animation must NOT set translate() — it overwrote Tailwind -translate-* centering and caused off-screen / clipped modals. */
+.vex-vsel-root .vex-vsel-panel {
+	opacity: 0;
+	transform: scale(0.96);
+	transform-origin: center center;
+	transition:
+		opacity 240ms var(--vex-ease),
+		transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.vex-vsel-root.vex-vsel-open .vex-vsel-panel {
+	opacity: 1;
+	transform: scale(1);
+}
+
+/* Home: selected version pill flash after pick */
+@keyframes vexVersionPillFlash {
+	0% {
+		box-shadow: 0 0 0 0 rgba(124, 92, 255, 0);
+		border-color: rgba(255, 255, 255, 0.1);
+	}
+	35% {
+		box-shadow: 0 0 0 1px rgba(124, 92, 255, 0.45), 0 0 34px rgba(124, 92, 255, 0.35);
+		border-color: rgba(124, 92, 255, 0.55);
+	}
+	100% {
+		box-shadow: 0 0 0 0 rgba(124, 92, 255, 0);
+		border-color: rgba(255, 255, 255, 0.1);
+	}
+}
+
+.vex-version-pill-flash {
+	animation: vexVersionPillFlash 900ms var(--vex-ease) both;
+}
+
+@keyframes vexVersionIdSwap {
+	from {
+		opacity: 0;
+		transform: translateY(4px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.vex-version-id-swap {
+	animation: vexVersionIdSwap 320ms var(--vex-ease) both;
+}
+
+.vex-vsel-select-ready {
+	box-shadow: 0 0 22px rgba(124, 92, 255, 0.35) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.vex-home-glow-drift,
+	.vex-play-btn-idle,
+	.vex-play-wrap-idle .vex-play-aura,
+	.vex-play-loading-sweep,
+	.vex-play-ripple,
+	.vex-play-btn:hover .vex-play-shine,
+	.vex-play-shine,
+	.vex-news-card-in,
+	.vex-version-pill-flash,
+	.vex-version-id-swap,
+	.vex-version-row-card-in,
+	.vex-play-vcarousel-enter,
+	.vex-vsel-root .vex-vsel-carousel-track {
+		animation: none !important;
+	}
+	.vex-vsel-root .vex-vsel-overlay,
+	.vex-vsel-root .vex-vsel-panel {
+		transition: none !important;
+	}
+	.vex-hero-step {
+		transform: none !important;
+	}
+}
+
+/* ------------------------------ */
+/* Boot / loading — cosmic splash (matches marketing mock) */
+/* ------------------------------ */
+
+.vex-boot-root {
+	position: fixed;
+	inset: 0;
+	z-index: 1000;
+	min-height: 100vh;
+	width: 100vw;
+	overflow: hidden;
+	transform: translateZ(0);
+	pointer-events: none;
+	display: flex;
+	flex-direction: column;
+	color: rgba(245, 242, 255, 0.94);
+}
+
+.vex-boot-cosmicImg {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	/* Align central purple vortex behind logo stack (matches reference art). */
+	object-position: 50% 36%;
+	opacity: 0;
+	animation: vexBootShellIn 520ms ease-out forwards;
+}
+
+/* Procedural cosmic backdrop (replaces boot PNG); same entrance as former cosmic image. */
+.vex-boot-cosmicRoot {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	animation: vexBootShellIn 520ms ease-out forwards;
+}
+
+.vex-boot-cosmicVignette {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	background:
+		radial-gradient(ellipse 78% 58% at 50% 36%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.12) 48%, rgba(0, 0, 0, 0.55) 100%),
+		linear-gradient(180deg, rgba(0, 0, 0, 0.14) 0%, rgba(0, 0, 0, 0) 36%, rgba(0, 0, 0, 0.32) 100%);
+}
+
+/* Extra bloom on the vortex so UI reads “above” the scene like the mock. */
+.vex-boot-vortexBloom {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	background: radial-gradient(ellipse 55% 42% at 50% 34%, rgba(168, 85, 247, 0.14) 0%, rgba(124, 58, 237, 0.04) 45%, transparent 72%);
+	mix-blend-mode: screen;
+}
+
+@keyframes vexBootShellIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+.vex-boot-brandStack {
+	position: relative;
+	z-index: 1;
+}
+
+.vex-boot-markGlow {
+	filter: drop-shadow(0 0 28px rgba(192, 132, 252, 0.75)) drop-shadow(0 0 64px rgba(168, 85, 247, 0.45))
+		drop-shadow(0 0 100px rgba(139, 92, 246, 0.2));
+}
+
+.vex-boot-markSteel {
+	filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.65));
+	opacity: 0.96;
+}
+
+.vex-boot-titleMetal {
+	background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 32%, #ddd6fe 58%, #a78bfa 82%, #7c3aed 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	filter: drop-shadow(0 2px 14px rgba(0, 0, 0, 0.45)) drop-shadow(0 0 28px rgba(168, 85, 247, 0.4));
+}
+
+.vex-boot-clientSub {
+	color: #c4b5fd;
+	text-shadow:
+		0 0 24px rgba(167, 139, 250, 0.55),
+		0 0 48px rgba(124, 58, 237, 0.25);
+	letter-spacing: 0.62em;
+}
+
+.vex-boot-loadingLabel {
+	text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45);
+}
+
+.vex-boot-track {
+	background: rgba(8, 5, 18, 0.92);
+}
+
+.vex-boot-trackShell {
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.08),
+		0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+.vex-boot-pct {
+	color: #fafafa;
+	text-shadow:
+		0 1px 3px rgba(0, 0, 0, 0.85),
+		0 0 18px rgba(0, 0, 0, 0.5);
+}
+
+.vex-boot-tip {
+	color: rgba(252, 250, 255, 0.92);
+	text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+}
+
+.vex-boot-tipIcon {
+	border-color: rgba(196, 181, 253, 0.55);
+	background: rgba(76, 29, 149, 0.35);
+	color: #f5f3ff;
+	box-shadow: 0 0 16px rgba(139, 92, 246, 0.2);
+}
+
+.vex-boot-fill {
+	transition: width 260ms var(--vex-ease);
+	background: linear-gradient(90deg, #6d28d9 0%, #a855f7 42%, #d8b4fe 100%);
+	box-shadow:
+		0 0 28px rgba(168, 85, 247, 0.38),
+		inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.vex-boot-barSheen {
+	opacity: 0.38;
+	pointer-events: none;
+	mix-blend-mode: screen;
+	background: linear-gradient(
+		100deg,
+		transparent 0%,
+		rgba(255, 255, 255, 0) 35%,
+		rgba(255, 255, 255, 0.22) 50%,
+		rgba(255, 255, 255, 0) 65%,
+		transparent 100%
+	);
+	background-size: 200% 100%;
+	animation: vexBootBarSheen 1.85s linear infinite;
+}
+
+@keyframes vexBootBarSheen {
+	from {
+		transform: translateX(-120%);
+	}
+	to {
+		transform: translateX(120%);
+	}
+}
+
+.vex-boot-rail {
+	height: 1.5px;
+	min-width: 6px;
+	align-self: center;
+	border-radius: 999px;
+}
+
+.vex-boot-railSpacer {
+	height: 2px;
+	min-width: 4px;
+	align-self: center;
+}
+
+.vex-boot-rail--off {
+	background: linear-gradient(90deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.09));
+	opacity: 0.45;
+}
+
+.vex-boot-rail--on {
+	background: linear-gradient(
+		90deg,
+		rgba(124, 58, 237, 0.35) 0%,
+		rgba(192, 132, 252, 0.95) 48%,
+		rgba(167, 139, 250, 0.45) 100%
+	);
+	box-shadow: 0 0 12px rgba(168, 85, 247, 0.42);
+}
+
+@keyframes vexBootRailPulse {
+	0%,
+	100% {
+		opacity: 1;
+		filter: brightness(1);
+	}
+	50% {
+		opacity: 0.82;
+		filter: brightness(1.15);
+	}
+}
+
+.vex-boot-rail--pulse {
+	animation: vexBootRailPulse 1.35s ease-in-out infinite;
+}
+
+.vex-boot-node {
+	background: rgba(8, 4, 16, 0.42);
+	border-radius: 0.85rem;
+}
+
+.vex-boot-node--current {
+	border-color: rgba(216, 180, 254, 0.85) !important;
+	color: #faf5ff;
+	box-shadow:
+		0 0 32px rgba(192, 132, 252, 0.55),
+		0 0 56px rgba(124, 58, 237, 0.35),
+		inset 0 1px 0 rgba(255, 255, 255, 0.12);
+	background: rgba(88, 28, 135, 0.35);
+}
+
+.vex-boot-node--done {
+	border-color: rgba(167, 139, 250, 0.55) !important;
+	color: rgba(237, 233, 254, 0.95);
+	background: rgba(15, 10, 28, 0.5);
+}
+
+.vex-boot-node--idle {
+	border-color: rgba(255, 255, 255, 0.12) !important;
+	color: rgba(255, 255, 255, 0.38);
+	opacity: 0.68;
+	background: rgba(0, 0, 0, 0.22);
+}
+
+.vex-boot-label--current {
+	color: rgb(250 245 255);
+	text-shadow: 0 0 14px rgba(168, 85, 247, 0.45);
+}
+
+.vex-boot-label--done {
+	color: rgba(237, 233, 254, 0.58);
+}
+
+.vex-boot-label--idle {
+	color: rgba(255, 255, 255, 0.28);
+}
+
+@keyframes vexBootOut {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+.vex-boot-exit {
+	animation: vexBootOut 220ms var(--vex-ease) both;
+	pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.vex-boot-barSheen,
+	.vex-boot-rail--pulse {
+		animation: none !important;
+	}
+	.vex-boot-cosmicImg,
+	.vex-boot-cosmicRoot {
+		opacity: 1;
+		animation: none !important;
+	}
+	.vex-boot-fill {
+		transition: none;
+	}
+}
+
+/* Settings page micro-motion + slider */
+@keyframes vexSettingsOut {
+	from {
+		opacity: 1;
+		transform: translateX(0);
+	}
+	to {
+		opacity: 0;
+		transform: translateX(-8px);
+	}
+}
+@keyframes vexSettingsIn {
+	from {
+		opacity: 0;
+		transform: translateX(8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+.vex-settings-swap-out {
+	animation: vexSettingsOut 240ms var(--vex-ease) both;
+}
+.vex-settings-swap-in {
+	animation: vexSettingsIn 240ms var(--vex-ease) both;
+}
+@media (prefers-reduced-motion: reduce) {
+	.vex-settings-swap-out,
+	.vex-settings-swap-in {
+		animation: none !important;
+	}
+}
+
+.vex-range {
+	-webkit-appearance: none;
+	appearance: none;
+	height: 4px;
+	border-radius: 999px;
+	background: #2a2a35;
+	outline: none;
+}
+.vex-range::-webkit-slider-runnable-track {
+	height: 4px;
+	border-radius: 999px;
+	background: linear-gradient(90deg, #7c5cff var(--vex-range-pct, 50%), #2a2a35 0);
+}
+.vex-range::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 14px;
+	height: 14px;
+	border-radius: 999px;
+	background: #ffffff;
+	box-shadow: 0 0 0 2px rgba(124, 92, 255, 0.18);
+	transition: transform 160ms var(--vex-ease);
+	margin-top: -5px;
+}
+.vex-range:hover::-webkit-slider-thumb {
+	transform: scale(1.12);
+}
+.vex-range::-moz-range-track {
+	height: 4px;
+	border-radius: 999px;
+	background: #2a2a35;
+}
+.vex-range::-moz-range-progress {
+	height: 4px;
+	border-radius: 999px;
+	background: #7c5cff;
+}
+.vex-range::-moz-range-thumb {
+	width: 14px;
+	height: 14px;
+	border: none;
+	border-radius: 999px;
+	background: #ffffff;
+	box-shadow: 0 0 0 2px rgba(124, 92, 255, 0.18);
+	transition: transform 160ms var(--vex-ease);
+}
+.vex-range:hover::-moz-range-thumb {
+	transform: scale(1.12);
+}
+
+/* ─── Home hero: space + flying Vex ─── */
+.vex-home-starfield {
+	background-image:
+		radial-gradient(1px 1px at 8% 12%, rgba(255, 255, 255, 0.95), transparent),
+		radial-gradient(1px 1px at 18% 44%, rgba(255, 255, 255, 0.75), transparent),
+		radial-gradient(1px 1px at 28% 8%, rgba(230, 220, 255, 0.85), transparent),
+		radial-gradient(1px 1px at 42% 62%, rgba(255, 255, 255, 0.55), transparent),
+		radial-gradient(1px 1px at 55% 18%, rgba(255, 255, 255, 0.8), transparent),
+		radial-gradient(1px 1px at 68% 48%, rgba(255, 255, 255, 0.65), transparent),
+		radial-gradient(1px 1px at 78% 12%, rgba(255, 255, 255, 0.9), transparent),
+		radial-gradient(1px 1px at 88% 72%, rgba(255, 255, 255, 0.5), transparent),
+		radial-gradient(1px 1px at 12% 78%, rgba(200, 190, 255, 0.7), transparent),
+		radial-gradient(1px 1px at 92% 28%, rgba(255, 255, 255, 0.72), transparent),
+		radial-gradient(1px 1px at 38% 88%, rgba(255, 255, 255, 0.45), transparent),
+		radial-gradient(1px 1px at 62% 82%, rgba(255, 255, 255, 0.6), transparent),
+		radial-gradient(1.5px 1.5px at 22% 30%, rgba(255, 255, 255, 0.95), transparent),
+		radial-gradient(1.5px 1.5px at 72% 36%, rgba(255, 255, 255, 0.85), transparent),
+		radial-gradient(1px 1px at 48% 6%, rgba(255, 255, 255, 0.55), transparent),
+		radial-gradient(1px 1px at 5% 56%, rgba(255, 255, 255, 0.5), transparent),
+		radial-gradient(1px 1px at 95% 88%, rgba(255, 255, 255, 0.48), transparent);
+	animation: vexHomeStarsTwinkle 10s ease-in-out infinite;
+}
+
+@keyframes vexHomeStarsTwinkle {
+	0%,
+	100% {
+		opacity: 0.88;
+	}
+	50% {
+		opacity: 1;
+	}
+}
+
+@keyframes vexHomeNebulaDrift {
+	0% {
+		transform: translate(0, 0) scale(1);
+	}
+	50% {
+		transform: translate(2%, -1.5%) scale(1.04);
+	}
+	100% {
+		transform: translate(-1.5%, 1%) scale(0.98);
+	}
+}
+
+.vex-home-nebula-a {
+	animation: vexHomeNebulaDrift 42s ease-in-out infinite alternate;
+}
+.vex-home-nebula-b {
+	animation: vexHomeNebulaDrift 56s ease-in-out infinite alternate-reverse;
+}
+.vex-home-nebula-c {
+	animation: vexHomeNebulaDrift 38s ease-in-out infinite alternate;
+}
+
+@keyframes vexHomeFlyA {
+	0% {
+		transform: translate3d(-18vw, 72vh, 0) rotate(-18deg) scale(0.65);
+		opacity: 0.35;
+	}
+	20% {
+		opacity: 0.9;
+	}
+	100% {
+		transform: translate3d(108vw, -8vh, 0) rotate(12deg) scale(0.95);
+		opacity: 0.4;
+	}
+}
+
+@keyframes vexHomeFlyB {
+	0% {
+		transform: translate3d(105vw, 48vh, 0) rotate(15deg) scale(0.75);
+		opacity: 0.45;
+	}
+	35% {
+		opacity: 0.88;
+	}
+	100% {
+		transform: translate3d(-22vw, -12vh, 0) rotate(-10deg) scale(0.7);
+		opacity: 0.35;
+	}
+}
+
+@keyframes vexHomeFlyC {
+	0% {
+		transform: translate3d(12vw, 88vh, 0) rotate(8deg) scale(0.55);
+		opacity: 0.3;
+	}
+	50% {
+		opacity: 0.85;
+	}
+	100% {
+		transform: translate3d(92vw, 8vh, 0) rotate(-14deg) scale(0.85);
+		opacity: 0.45;
+	}
+}
+
+@keyframes vexHomeFlyD {
+	0% {
+		transform: translate3d(55vw, 95vh, 0) rotate(-6deg) scale(0.6);
+		opacity: 0.4;
+	}
+	100% {
+		transform: translate3d(-15vw, -18vh, 0) rotate(18deg) scale(0.8);
+		opacity: 0.35;
+	}
+}
+
+@keyframes vexHomeFlyE {
+	0% {
+		transform: translate3d(-12vw, 28vh, 0) rotate(20deg) scale(0.72);
+		opacity: 0.5;
+	}
+	100% {
+		transform: translate3d(100vw, 62vh, 0) rotate(-8deg) scale(0.68);
+		opacity: 0.38;
+	}
+}
+
+@keyframes vexHomeFlyF {
+	0% {
+		transform: translate3d(78vw, -5vh, 0) rotate(-12deg) scale(0.5);
+		opacity: 0.25;
+	}
+	40% {
+		opacity: 0.75;
+	}
+	100% {
+		transform: translate3d(-8vw, 92vh, 0) rotate(6deg) scale(0.65);
+		opacity: 0.3;
+	}
+}
+
+@keyframes vexHomeFlyG {
+	0% {
+		transform: translate3d(30vw, -15vh, 0) rotate(-4deg) scale(0.58);
+		opacity: 0.35;
+	}
+	100% {
+		transform: translate3d(85vw, 78vh, 0) rotate(14deg) scale(0.82);
+		opacity: 0.42;
+	}
+}
+
+.vex-home-flyer {
+	opacity: 0.85;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+	will-change: transform, opacity;
+}
+
+.vex-home-flyer--a {
+	animation-name: vexHomeFlyA;
+	animation-duration: 52s;
+}
+.vex-home-flyer--b {
+	animation-name: vexHomeFlyB;
+	animation-duration: 58s;
+}
+.vex-home-flyer--c {
+	animation-name: vexHomeFlyC;
+	animation-duration: 46s;
+}
+.vex-home-flyer--d {
+	animation-name: vexHomeFlyD;
+	animation-duration: 64s;
+}
+.vex-home-flyer--e {
+	animation-name: vexHomeFlyE;
+	animation-duration: 50s;
+}
+.vex-home-flyer--f {
+	animation-name: vexHomeFlyF;
+	animation-duration: 72s;
+}
+.vex-home-flyer--g {
+	animation-name: vexHomeFlyG;
+	animation-duration: 55s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.vex-home-starfield,
+	.vex-home-nebula-a,
+	.vex-home-nebula-b,
+	.vex-home-nebula-c,
+	.vex-home-flyer {
+		animation: none !important;
+	}
+	.vex-home-flyer {
+		opacity: 0.5;
+	}
+}
