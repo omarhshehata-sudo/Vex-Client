@@ -1,6 +1,7 @@
 package com.vexclient.client.mc.hud;
 
 import com.vexclient.VexClient;
+import com.vexclient.client.core.VexRenderUtils;
 import com.vexclient.client.core.VexTheme;
 import com.vexclient.client.mc.input.CpsTracker;
 import com.vexclient.config.ConfigManager;
@@ -14,15 +15,17 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer;
 
 /**
- * Lightweight overlay renderer for QoL HUD lines (FPS/CPS/coordinates).
+ * Professional HUD overlay renderer with modern styling and visual polish.
  *
  * <p>Registered as a hud layer anchored after subtitles so overlays stay above vanilla HUD clutter.
- *
- * TODO: Split each HUD line into its own tiny class once overlays grow (graphs / draggable HUD stacks ...).
- * TODO: If you introduce many overlays, consolidate behind a registry that maps {@link com.vexclient.module.HudOverlayId} -> renderer.
  */
 public final class VexHudRenderer {
 	private static final ResourceLocation HUD_LAYER_ID = ResourceLocation.fromNamespaceAndPath(VexClient.MOD_ID, "hud_quality_of_life");
+
+	// Smooth value transitions
+	private static float smoothFps = 0;
+	private static float smoothCps = 0;
+	private static long lastRenderTime = 0;
 
 	private VexHudRenderer() {
 	}
@@ -46,20 +49,34 @@ public final class VexHudRenderer {
 			return;
 		}
 
+		// Update smooth transitions
+		long currentTime = System.currentTimeMillis();
+		float deltaTime = lastRenderTime == 0 ? 0 : (currentTime - lastRenderTime) / 1000f;
+		lastRenderTime = currentTime;
+
+		float lerpSpeed = 8f;
+		smoothFps += (client.getFps() - smoothFps) * Math.min(1f, deltaTime * lerpSpeed);
+		smoothCps += (cpsTracker.clicksPerSecond() - smoothCps) * Math.min(1f, deltaTime * lerpSpeed);
+
 		Font tr = client.font;
 
 		java.util.ArrayList<HudLine> lines = new java.util.ArrayList<>();
 		if (cfg.hudFpsCounter) {
-			lines.add(new HudLine("FPS", Integer.toString(client.getFps())));
+			int fps = Math.round(smoothFps);
+			int fpsColor = getFpsColor(fps);
+			lines.add(new HudLine("FPS", Integer.toString(fps), VexTheme.ACCENT_PURPLE, fpsColor));
 		}
 		if (cfg.hudCpsCounter) {
-			lines.add(new HudLine("CPS", Integer.toString(cpsTracker.clicksPerSecond())));
+			int cps = Math.round(smoothCps);
+			lines.add(new HudLine("CPS", Integer.toString(cps), VexTheme.INFO_BLUE, VexTheme.TEXT_WHITE));
 		}
 		if (cfg.hudCoordinates) {
 			var bp = client.player.blockPosition();
 			lines.add(new HudLine(
 					"XYZ",
-					bp.getX() + " / " + bp.getY() + " / " + bp.getZ()
+					bp.getX() + " / " + bp.getY() + " / " + bp.getZ(),
+					VexTheme.WARNING_YELLOW,
+					VexTheme.TEXT_WHITE
 			));
 		}
 
@@ -67,58 +84,85 @@ public final class VexHudRenderer {
 			return;
 		}
 
-		int lineHeight = Math.max(tr.lineHeight + 1, 10);
-		int padX = 6;
-		int padY = 4;
+		int lineHeight = 16;
+		int padX = 10;
+		int padY = 8;
+		int lineGap = 4;
 
-		int maxWidth = 0;
+		int maxLabelWidth = 0;
+		int maxValueWidth = 0;
 		for (HudLine line : lines) {
-			int w = tr.width(line.label());
-			if (!line.value().isEmpty()) {
-				w += tr.width(" " + line.value());
-			}
-			maxWidth = Math.max(maxWidth, w);
+			maxLabelWidth = Math.max(maxLabelWidth, tr.width(line.label()));
+			maxValueWidth = Math.max(maxValueWidth, tr.width(line.value()));
 		}
 
-		int margin = 6;
-		int boxW = maxWidth + padX * 2;
-		int boxH = padY * 2 + lineHeight * lines.size();
+		int margin = 8;
+		int boxW = padX * 2 + maxLabelWidth + 8 + maxValueWidth + 8;
+		int boxH = padY * 2 + lineHeight * lines.size() + lineGap * (lines.size() - 1);
 		int left = margin;
 		int scaledHeight = client.getWindow().getGuiScaledHeight();
-
 		int top = scaledHeight - margin - boxH;
 
-		fillOutline(context, left, top, boxW, boxH, VexTheme.PANEL_BACKGROUND, VexTheme.BORDER_PURPLE);
+		// Draw drop shadow
+		VexRenderUtils.drawDropShadow(context, left, top, boxW, boxH, 6, 2, 2);
 
-		int ty = top + padY + 1;
+		// Draw subtle outer glow
+		VexRenderUtils.drawGlow(context, left, top, boxW, boxH, 3, VexTheme.withAlpha(VexTheme.BORDER_PURPLE, 30));
+
+		// Draw main panel
+		VexRenderUtils.fillRoundedRect(context, left, top, boxW, boxH, VexTheme.CORNER_RADIUS_MEDIUM, VexTheme.PANEL_BACKGROUND);
+
+		// Draw border
+		VexRenderUtils.drawRoundedRectOutline(context, left, top, boxW, boxH, VexTheme.CORNER_RADIUS_MEDIUM, 1, VexTheme.BORDER_PURPLE);
+
+		// Draw header accent line
+		VexRenderUtils.fillHorizontalGradient(context, left + 2, top, boxW - 4, 2,
+			VexTheme.withAlpha(VexTheme.ACCENT_PURPLE, 0),
+			VexTheme.withAlpha(VexTheme.ACCENT_PURPLE, 150));
+
+		// Render each line
+		int ty = top + padY;
 		for (int i = 0; i < lines.size(); i++) {
-			renderLine(context, tr, left + padX, ty + i * lineHeight, lines.get(i));
+			renderLine(context, tr, left + padX, ty + i * (lineHeight + lineGap), lines.get(i), maxLabelWidth);
 		}
 	}
 
-	private static void renderLine(GuiGraphics ctx, Font tr, int x, int y, HudLine line) {
-		int cursor = x;
-
-		ctx.drawString(tr, line.label(), cursor + 1, y + 1, VexTheme.SHADOW_DEEP_PURPLE, false);
-		ctx.drawString(tr, line.label(), cursor, y, VexTheme.ACCENT_PURPLE, false);
-		cursor += tr.width(line.label());
-
-		if (!line.value().isEmpty()) {
-			String gapPlusValue = " " + line.value();
-			ctx.drawString(tr, gapPlusValue, cursor + 1, y + 1, VexTheme.SHADOW_DEEP_PURPLE, false);
-			ctx.drawString(tr, gapPlusValue, cursor, y, VexTheme.TEXT_WHITE, false);
+	private static int getFpsColor(int fps) {
+		if (fps >= 60) {
+			return VexTheme.SUCCESS_GREEN;
+		} else if (fps >= 30) {
+			return VexTheme.WARNING_YELLOW;
+		} else {
+			return VexTheme.ERROR_RED;
 		}
 	}
 
-	private record HudLine(String label, String value) {
+	private static void renderLine(GuiGraphics ctx, Font tr, int x, int y, HudLine line, int labelWidth) {
+		// Draw label badge
+		int labelBadgeW = labelWidth + 8;
+		int labelBadgeH = 14;
+		int labelBadgeY = y + 1;
+
+		VexRenderUtils.fillRoundedRect(ctx, x - 4, labelBadgeY, labelBadgeW, labelBadgeH, 3,
+			VexTheme.withAlpha(line.labelColor(), 30));
+
+		// Draw label text
+		int labelX = x;
+		int textY = y + 3;
+		ctx.drawString(tr, line.label(), labelX + 1, textY + 1, VexTheme.withAlpha(VexTheme.SHADOW_BLACK, 100), false);
+		ctx.drawString(tr, line.label(), labelX, textY, line.labelColor(), false);
+
+		// Draw separator dot
+		int dotX = x + labelWidth + 6;
+		int dotY = y + 6;
+		VexRenderUtils.fillRoundedRect(ctx, dotX, dotY, 3, 3, 2, VexTheme.TEXT_MUTED);
+
+		// Draw value
+		int valueX = dotX + 8;
+		ctx.drawString(tr, line.value(), valueX + 1, textY + 1, VexTheme.withAlpha(VexTheme.SHADOW_BLACK, 100), false);
+		ctx.drawString(tr, line.value(), valueX, textY, line.valueColor(), false);
 	}
 
-	private static void fillOutline(GuiGraphics context, int x, int y, int w, int h, int fill, int border) {
-		context.fill(x, y, x + w, y + h, fill);
-		int t = 1;
-		context.fill(x, y, x + w, y + t, border);
-		context.fill(x, y + h - t, x + w, y + h, border);
-		context.fill(x, y, x + t, y + h, border);
-		context.fill(x + w - t, y, x + w, y + h, border);
+	private record HudLine(String label, String value, int labelColor, int valueColor) {
 	}
 }

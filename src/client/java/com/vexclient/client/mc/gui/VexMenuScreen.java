@@ -1,18 +1,19 @@
 package com.vexclient.client.mc.gui;
 
+import com.vexclient.client.core.VexRenderUtils;
 import com.vexclient.client.core.VexTheme;
+import com.vexclient.client.mc.gui.widget.VexButton;
 import com.vexclient.config.ConfigManager;
 import com.vexclient.config.VexClientConfigData;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 
 /**
- * Thin settings shell with category tabs — grows alongside future QoL modules.
+ * Professional settings shell with category tabs and modern styling.
  *
  * ESC closes while playing; reopen with Right Shift via {@link com.vexclient.client.VexClientClient}.
  */
@@ -23,51 +24,26 @@ public class VexMenuScreen extends Screen {
 		SETTINGS
 	}
 
-	private static final int PANEL_W = 320;
-	private static final int PANEL_H = 220;
+	private static final int PANEL_W = 340;
+	private static final int PANEL_H = 240;
+	private static final int CORNER_RADIUS = VexTheme.CORNER_RADIUS_LARGE;
 
 	private Tab tab = Tab.HUD;
 
-	private Button tabHudButton;
-	private Button tabPerfButton;
-	private Button tabSettingsButton;
+	private VexButton tabHudButton;
+	private VexButton tabPerfButton;
+	private VexButton tabSettingsButton;
 
-	private Button fpsToggle;
-	private Button cpsToggle;
-	private Button coordsToggle;
+	// Toggle states for smooth animations
+	private boolean[] toggleStates = new boolean[3];
+	private float[] toggleAnimations = new float[3];
 
 	public VexMenuScreen() {
 		super(Component.translatable("vexclient.screen.menu.title"));
 	}
 
-	private void applyTabLabels() {
-		tabHudButton.setMessage(Tab.HUD.equals(tab)
-				? Component.translatable("vexclient.screen.menu.tabs.hud_selected")
-				: Component.translatable("vexclient.screen.menu.tabs.hud"));
-		tabPerfButton.setMessage(Tab.PERFORMANCE.equals(tab)
-				? Component.translatable("vexclient.screen.menu.tabs.performance_selected")
-				: Component.translatable("vexclient.screen.menu.tabs.performance"));
-		tabSettingsButton.setMessage(Tab.SETTINGS.equals(tab)
-				? Component.translatable("vexclient.screen.menu.tabs.settings_selected")
-				: Component.translatable("vexclient.screen.menu.tabs.settings"));
-	}
-
-	private void rebuildHudTexts() {
-		VexClientConfigData cfg = ConfigManager.INSTANCE.get();
-		this.fpsToggle.setMessage(Component.translatable(
-				cfg.hudFpsCounter ? "vexclient.screen.menu.toggle.fps.on" : "vexclient.screen.menu.toggle.fps.off"));
-		this.cpsToggle.setMessage(Component.translatable(
-				cfg.hudCpsCounter ? "vexclient.screen.menu.toggle.cps.on" : "vexclient.screen.menu.toggle.cps.off"));
-		this.coordsToggle.setMessage(Component.translatable(
-				cfg.hudCoordinates ? "vexclient.screen.menu.toggle.coords.on" : "vexclient.screen.menu.toggle.coords.off"));
-	}
-
-	private void refreshVisibility() {
-		boolean hudTab = Tab.HUD.equals(tab);
-		this.fpsToggle.visible = hudTab;
-		this.cpsToggle.visible = hudTab;
-		this.coordsToggle.visible = hudTab;
-		this.applyTabLabels();
+	private void applyTabStyle(VexButton button, boolean selected) {
+		// Tab styling is handled in render
 	}
 
 	@Override
@@ -75,62 +51,77 @@ public class VexMenuScreen extends Screen {
 		super.init();
 
 		ConfigManager.INSTANCE.ensureLoaded();
+		VexClientConfigData cfg = ConfigManager.INSTANCE.get();
+
+		// Initialize toggle states
+		toggleStates[0] = cfg.hudFpsCounter;
+		toggleStates[1] = cfg.hudCpsCounter;
+		toggleStates[2] = cfg.hudCoordinates;
 
 		int px = this.width / 2 - PANEL_W / 2;
 		int py = this.height / 2 - PANEL_H / 2;
 
-		int btnH = 20;
-		int tabGap = 6;
-		int tabW = (PANEL_W - 16 - tabGap * 2) / 3;
-		int tabY = py + 42;
+		int btnH = 24;
+		int tabGap = 8;
+		int tabW = (PANEL_W - 32 - tabGap * 2) / 3;
+		int tabY = py + 50;
 
-		this.tabHudButton = Button.builder(Component.empty(), btn -> {
-			tab = Tab.HUD;
-			refreshVisibility();
-		}).bounds(px + 12, tabY, tabW, btnH).build();
+		this.tabHudButton = VexButton.builder(
+				Component.translatable("vexclient.screen.menu.tabs.hud"),
+				btn -> { tab = Tab.HUD; }
+		).position(px + 16, tabY).size(tabW, btnH).style(VexButton.Style.SECONDARY).build();
 
-		this.tabPerfButton = Button.builder(Component.empty(), btn -> {
-			tab = Tab.PERFORMANCE;
-			refreshVisibility();
-		}).bounds(px + 12 + tabW + tabGap, tabY, tabW, btnH).build();
+		this.tabPerfButton = VexButton.builder(
+				Component.translatable("vexclient.screen.menu.tabs.performance"),
+				btn -> { tab = Tab.PERFORMANCE; }
+		).position(px + 16 + tabW + tabGap, tabY).size(tabW, btnH).style(VexButton.Style.SECONDARY).build();
 
-		this.tabSettingsButton = Button.builder(Component.empty(), btn -> {
-			tab = Tab.SETTINGS;
-			refreshVisibility();
-		}).bounds(px + 12 + (tabW + tabGap) * 2, tabY, tabW, btnH).build();
-
-		int rowStartY = tabY + btnH + 18;
-		int rowW = PANEL_W - 24;
-
-		this.fpsToggle = Button.builder(Component.empty(), btn -> {
-			ConfigManager.INSTANCE.update(cfg -> cfg.hudFpsCounter = !cfg.hudFpsCounter);
-			rebuildHudTexts();
-		}).bounds(px + 14, rowStartY + 2, rowW, btnH).build();
-
-		this.cpsToggle = Button.builder(Component.empty(), btn -> {
-			ConfigManager.INSTANCE.update(cfg -> cfg.hudCpsCounter = !cfg.hudCpsCounter);
-			rebuildHudTexts();
-		}).bounds(px + 14, rowStartY + 2 + (btnH + 6), rowW, btnH).build();
-
-		this.coordsToggle = Button.builder(Component.empty(), btn -> {
-			ConfigManager.INSTANCE.update(cfg -> cfg.hudCoordinates = !cfg.hudCoordinates);
-			rebuildHudTexts();
-		}).bounds(px + 14, rowStartY + 2 + (btnH + 6) * 2, rowW, btnH).build();
+		this.tabSettingsButton = VexButton.builder(
+				Component.translatable("vexclient.screen.menu.tabs.settings"),
+				btn -> { tab = Tab.SETTINGS; }
+		).position(px + 16 + (tabW + tabGap) * 2, tabY).size(tabW, btnH).style(VexButton.Style.SECONDARY).build();
 
 		this.addRenderableWidget(this.tabHudButton);
 		this.addRenderableWidget(this.tabPerfButton);
 		this.addRenderableWidget(this.tabSettingsButton);
-		this.addRenderableWidget(this.fpsToggle);
-		this.addRenderableWidget(this.cpsToggle);
-		this.addRenderableWidget(this.coordsToggle);
-
-		rebuildHudTexts();
-		refreshVisibility();
 	}
 
 	@Override
 	public boolean isPauseScreen() {
 		return false;
+	}
+
+	@Override
+	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+		if (button == 0) {
+			// Check toggle switch clicks
+			int px = this.width / 2 - PANEL_W / 2;
+			int py = this.height / 2 - PANEL_H / 2;
+			int rowStartY = py + 50 + 24 + 20;
+
+			if (Tab.HUD.equals(tab)) {
+				for (int i = 0; i < 3; i++) {
+					int toggleX = px + PANEL_W - 16 - 44;
+					int toggleY = rowStartY + i * 36 + 4;
+					
+					if (mouseX >= toggleX && mouseX <= toggleX + 44 &&
+						mouseY >= toggleY && mouseY <= toggleY + 22) {
+						toggleStates[i] = !toggleStates[i];
+						
+						// Save to config
+						ConfigManager.INSTANCE.update(cfg -> {
+							switch (i) {
+								case 0 -> cfg.hudFpsCounter = toggleStates[0];
+								case 1 -> cfg.hudCpsCounter = toggleStates[1];
+								case 2 -> cfg.hudCoordinates = toggleStates[2];
+							}
+						});
+						return true;
+					}
+				}
+			}
+		}
+		return super.mouseClicked(mouseX, mouseY, button);
 	}
 
 	@Override
@@ -140,79 +131,194 @@ public class VexMenuScreen extends Screen {
 		int px = this.width / 2 - PANEL_W / 2;
 		int py = this.height / 2 - PANEL_H / 2;
 
-		fillOutline(context, px, py, PANEL_W, PANEL_H, VexTheme.PANEL_BACKGROUND, VexTheme.BORDER_PURPLE);
+		// Draw drop shadow
+		VexRenderUtils.drawDropShadow(context, px, py, PANEL_W, PANEL_H, 12, 4, 6);
 
-		context.drawCenteredString(
-				this.font,
-				Component.translatable("vexclient.screen.menu.title"),
-				this.width / 2,
-				py + 14,
-				VexTheme.TEXT_WHITE);
+		// Draw main panel with rounded corners
+		VexRenderUtils.fillRoundedRect(context, px, py, PANEL_W, PANEL_H, CORNER_RADIUS, VexTheme.PANEL_BACKGROUND);
 
-		context.hLine(px + 10, px + PANEL_W - 10, py + 32, VexTheme.BORDER_PURPLE);
+		// Draw header gradient
+		VexRenderUtils.fillRoundedRect(context, px, py, PANEL_W, 44, CORNER_RADIUS, VexTheme.PANEL_HEADER);
+		// Fix bottom corners of header (overlap with body)
+		context.fill(px, py + 36, px + PANEL_W, py + 44, VexTheme.PANEL_HEADER);
 
+		// Draw border with glow
+		VexRenderUtils.drawGlow(context, px, py, PANEL_W, PANEL_H, 3, VexTheme.BORDER_PURPLE_GLOW);
+		VexRenderUtils.drawRoundedRectOutline(context, px, py, PANEL_W, PANEL_H, CORNER_RADIUS, 1, VexTheme.BORDER_PURPLE);
+
+		// Draw title with accent styling
+		String title = Component.translatable("vexclient.screen.menu.title").getString();
+		int titleWidth = this.font.width(title);
+		int titleX = this.width / 2 - titleWidth / 2;
+		int titleY = py + 16;
+
+		// Title shadow
+		context.drawString(this.font, title, titleX + 1, titleY + 1, VexTheme.SHADOW_DEEP_PURPLE, false);
+		context.drawString(this.font, title, titleX, titleY, VexTheme.TEXT_WHITE, false);
+
+		// Draw separator under header
+		VexRenderUtils.drawSeparator(context, px + 16, py + 44, PANEL_W - 32, VexTheme.BORDER_PURPLE);
+
+		// Render tab indicator
+		renderTabIndicator(context, px, py);
+
+		// Render widgets (tabs)
 		super.render(context, mouseX, mouseY, delta);
 
-		renderTabBodies(context, px, py);
+		// Render tab content
+		renderTabContent(context, px, py, mouseX, mouseY);
 
-		context.drawCenteredString(
+		// Footer hint
+		String hint = Component.translatable("vexclient.screen.menu.press_esc_close").getString();
+		int hintWidth = this.font.width(hint);
+		context.drawString(
 				this.font,
-				Component.translatable("vexclient.screen.menu.press_esc_close"),
-				this.width / 2,
-				py + PANEL_H - 18,
-				0xFF9AA0B8);
+				hint,
+				this.width / 2 - hintWidth / 2,
+				py + PANEL_H - 16,
+				VexTheme.TEXT_MUTED,
+				false);
 	}
 
-	private void renderTabBodies(GuiGraphics ctx, int px, int py) {
-		int inset = 14;
+	private void renderTabIndicator(GuiGraphics context, int px, int py) {
+		int tabY = py + 50;
+		int btnH = 24;
+		int tabGap = 8;
+		int tabW = (PANEL_W - 32 - tabGap * 2) / 3;
+
+		int indicatorX = px + 16;
+		if (Tab.PERFORMANCE.equals(tab)) {
+			indicatorX += tabW + tabGap;
+		} else if (Tab.SETTINGS.equals(tab)) {
+			indicatorX += (tabW + tabGap) * 2;
+		}
+
+		// Draw glowing indicator line under selected tab
+		int indicatorY = tabY + btnH + 2;
+		VexRenderUtils.drawGlow(context, indicatorX, indicatorY, tabW, 2, 4, VexTheme.ACCENT_PURPLE);
+		VexRenderUtils.fillRoundedRect(context, indicatorX, indicatorY, tabW, 2, 1, VexTheme.ACCENT_PURPLE);
+	}
+
+	private void renderTabContent(GuiGraphics context, int px, int py, int mouseX, int mouseY) {
+		int inset = 16;
 		int textMaxW = PANEL_W - inset * 2;
-		int bodyTop = py + 42 + 20 + 12;
+		int bodyTop = py + 50 + 24 + 20;
 		int left = px + inset;
 
-		if (Tab.PERFORMANCE.equals(tab)) {
-			String paragraph = I18n.get("vexclient.screen.performance.paragraph");
-			drawWrappedPlain(ctx, left, bodyTop + 6, textMaxW, paragraph, VexTheme.TEXT_WHITE);
+		if (Tab.HUD.equals(tab)) {
+			renderHudTab(context, px, py, left, bodyTop, mouseX, mouseY);
+		} else if (Tab.PERFORMANCE.equals(tab)) {
+			renderPerformanceTab(context, left, bodyTop, textMaxW, py);
+		} else if (Tab.SETTINGS.equals(tab)) {
+			renderSettingsTab(context, left, bodyTop, textMaxW);
+		}
+	}
 
-			ctx.drawString(
-					this.font,
-					Component.translatable("vexclient.screen.performance.placeholder_header"),
-					left,
-					py + PANEL_H - 110,
-					VexTheme.ACCENT_PURPLE,
-					false);
+	private void renderHudTab(GuiGraphics context, int px, int py, int left, int bodyTop, int mouseX, int mouseY) {
+		String[] labels = {
+			I18n.get("vexclient.screen.menu.toggle.fps.label", "FPS Counter"),
+			I18n.get("vexclient.screen.menu.toggle.cps.label", "CPS Counter"),
+			I18n.get("vexclient.screen.menu.toggle.coords.label", "Coordinates")
+		};
 
-			String[] todos = new String[] {
-					"* TODO(alpha+): optional FPS pacing hints (informational reminders only — no cheats).",
-					"* TODO(alpha+): frame-time overlay hooks reserved for profiler-style debugging overlays.",
-					"* TODO(alpha+): future render-distance / simulation-distance tips for low-memory installs."
-			};
-			int yTodo = py + PANEL_H - 92;
-			for (String line : todos) {
-				ctx.drawString(this.font, Component.literal(line), left, yTodo, 0xFF8492B5, false);
-				yTodo += 12;
+		String[] descriptions = {
+			I18n.get("vexclient.screen.menu.toggle.fps.desc", "Show frames per second"),
+			I18n.get("vexclient.screen.menu.toggle.cps.desc", "Show clicks per second"),
+			I18n.get("vexclient.screen.menu.toggle.coords.desc", "Show player coordinates")
+		};
+
+		int toggleWidth = 44;
+		int toggleHeight = 22;
+		int rowHeight = 36;
+
+		for (int i = 0; i < 3; i++) {
+			int rowY = bodyTop + i * rowHeight;
+			int toggleX = px + PANEL_W - 16 - toggleWidth;
+			int toggleY = rowY + 4;
+
+			// Update animation
+			float target = toggleStates[i] ? 1f : 0f;
+			toggleAnimations[i] += (target - toggleAnimations[i]) * 0.2f;
+
+			// Check hover
+			boolean hovered = mouseX >= toggleX && mouseX <= toggleX + toggleWidth &&
+							  mouseY >= toggleY && mouseY <= toggleY + toggleHeight;
+
+			// Draw row background on hover
+			if (hovered) {
+				VexRenderUtils.fillRoundedRect(context, left - 4, rowY - 2, PANEL_W - 32 + 8, rowHeight, 4, 
+					VexTheme.withAlpha(VexTheme.PANEL_BACKGROUND_LIGHT, 100));
 			}
-			return;
+
+			// Draw label
+			context.drawString(this.font, labels[i], left, rowY + 4, VexTheme.TEXT_WHITE, false);
+
+			// Draw description
+			context.drawString(this.font, descriptions[i], left, rowY + 16, VexTheme.TEXT_DIM, false);
+
+			// Draw toggle switch
+			VexRenderUtils.drawToggleSwitch(context, toggleX, toggleY, toggleWidth, toggleHeight, 
+				toggleStates[i], hovered ? 1f : 0f);
 		}
+	}
 
-		if (Tab.SETTINGS.equals(tab)) {
-			ctx.drawString(
-					this.font,
-					Component.translatable("vexclient.screen.settings.config_path.header"),
-					left,
-					bodyTop + 6,
-					VexTheme.ACCENT_PURPLE,
-					false);
+	private void renderPerformanceTab(GuiGraphics context, int left, int bodyTop, int textMaxW, int py) {
+		// Section header
+		context.drawString(this.font, 
+			Component.translatable("vexclient.screen.performance.header", "Performance Tips").getString(), 
+			left, bodyTop, VexTheme.ACCENT_PURPLE, false);
 
-			String pathShown = shorten(ConfigManager.INSTANCE.getConfigPath().toAbsolutePath().toString(), 58);
-			ctx.drawString(this.font, Component.literal(pathShown), left, bodyTop + 22, VexTheme.TEXT_WHITE, false);
+		VexRenderUtils.drawSeparator(context, left, bodyTop + 14, textMaxW, VexTheme.withAlpha(VexTheme.ACCENT_PURPLE, 100));
 
-			String hint = I18n.get("vexclient.screen.settings.hint");
-			drawWrappedPlain(ctx, left, bodyTop + 42, textMaxW, hint, 0xFFA8B5D6);
+		String paragraph = I18n.get("vexclient.screen.performance.paragraph");
+		drawWrappedPlain(context, left, bodyTop + 22, textMaxW, paragraph, VexTheme.TEXT_WHITE);
+
+		// Future features section
+		int featuresY = py + PANEL_H - 100;
+		context.drawString(this.font,
+			Component.translatable("vexclient.screen.performance.placeholder_header").getString(),
+			left, featuresY, VexTheme.ACCENT_PURPLE, false);
+
+		VexRenderUtils.drawSeparator(context, left, featuresY + 14, textMaxW, VexTheme.withAlpha(VexTheme.ACCENT_PURPLE, 100));
+
+		String[] todos = new String[] {
+			"FPS pacing hints (informational only)",
+			"Frame-time overlay for debugging",
+			"Distance tips for low-memory systems"
+		};
+
+		int yTodo = featuresY + 22;
+		for (String line : todos) {
+			// Draw bullet point
+			VexRenderUtils.fillRoundedRect(context, left, yTodo + 3, 4, 4, 2, VexTheme.TEXT_DIM);
+			context.drawString(this.font, line, left + 10, yTodo, VexTheme.TEXT_DIM, false);
+			yTodo += 14;
 		}
+	}
+
+	private void renderSettingsTab(GuiGraphics context, int left, int bodyTop, int textMaxW) {
+		// Config path section
+		context.drawString(this.font,
+			Component.translatable("vexclient.screen.settings.config_path.header").getString(),
+			left, bodyTop, VexTheme.ACCENT_PURPLE, false);
+
+		VexRenderUtils.drawSeparator(context, left, bodyTop + 14, textMaxW, VexTheme.withAlpha(VexTheme.ACCENT_PURPLE, 100));
+
+		// Config path in a styled box
+		String pathShown = shorten(ConfigManager.INSTANCE.getConfigPath().toAbsolutePath().toString(), 50);
+		int pathBoxY = bodyTop + 22;
+		VexRenderUtils.fillRoundedRect(context, left, pathBoxY, textMaxW, 20, 4, VexTheme.PANEL_BACKGROUND_LIGHT);
+		VexRenderUtils.drawRoundedRectOutline(context, left, pathBoxY, textMaxW, 20, 4, 1, 
+			VexTheme.withAlpha(VexTheme.BORDER_PURPLE, 80));
+		context.drawString(this.font, pathShown, left + 6, pathBoxY + 6, VexTheme.TEXT_WHITE, false);
+
+		// Hint text
+		String hint = I18n.get("vexclient.screen.settings.hint");
+		drawWrappedPlain(context, left, bodyTop + 52, textMaxW, hint, VexTheme.TEXT_DIM);
 	}
 
 	/**
-	 * Manual wrap for alpha: breaks on spaces and hard newlines. Good enough for short tutorial copy.
+	 * Manual wrap for alpha: breaks on spaces and hard newlines.
 	 */
 	private void drawWrappedPlain(GuiGraphics ctx, int left, int top, int maxWidth, String body, int color) {
 		String normalized = body.replace("\r\n", "\n");
@@ -250,15 +356,6 @@ public class VexMenuScreen extends Screen {
 		int keep = Math.max(16, maxChars - 6);
 		int lhs = keep / 2;
 		int rhs = keep - lhs;
-		return raw.substring(0, lhs) + " … " + raw.substring(raw.length() - rhs);
-	}
-
-	private static void fillOutline(GuiGraphics context, int x, int y, int w, int h, int fill, int border) {
-		context.fill(x, y, x + w, y + h, fill);
-		int t = 1;
-		context.fill(x, y, x + w, y + t, border);
-		context.fill(x, y + h - t, x + w, y + h, border);
-		context.fill(x, y, x + t, y + h, border);
-		context.fill(x + w - t, y, x + w, y + h, border);
+		return raw.substring(0, lhs) + " ... " + raw.substring(raw.length() - rhs);
 	}
 }

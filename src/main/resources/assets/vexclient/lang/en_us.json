@@ -2,6 +2,7 @@
   "vexclient.name": "Vex Client",
   "key.vexclient.open_menu": "Open Vex Client Menu",
   "key.categories.vex.client": "Vex Client",
+
   "vexclient.screen.menu.title": "Vex Client",
   "vexclient.screen.menu.press_esc_close": "Press ESC to close",
   "vexclient.screen.menu.tabs.hud": "HUD",
@@ -10,30 +11,44 @@
   "vexclient.screen.menu.tabs.performance_selected": "> Performance",
   "vexclient.screen.menu.tabs.settings": "Settings",
   "vexclient.screen.menu.tabs.settings_selected": "> Settings",
+
+  "vexclient.screen.menu.toggle.fps.label": "FPS Counter",
+  "vexclient.screen.menu.toggle.fps.desc": "Display frames per second",
   "vexclient.screen.menu.toggle.fps.on": "FPS overlay: Enabled",
   "vexclient.screen.menu.toggle.fps.off": "FPS overlay: Disabled",
+
+  "vexclient.screen.menu.toggle.cps.label": "CPS Counter",
+  "vexclient.screen.menu.toggle.cps.desc": "Display clicks per second",
   "vexclient.screen.menu.toggle.cps.on": "CPS overlay: Enabled",
   "vexclient.screen.menu.toggle.cps.off": "CPS overlay: Disabled",
+
+  "vexclient.screen.menu.toggle.coords.label": "Coordinates",
+  "vexclient.screen.menu.toggle.coords.desc": "Display player position",
   "vexclient.screen.menu.toggle.coords.on": "Coordinates overlay: Enabled",
   "vexclient.screen.menu.toggle.coords.off": "Coordinates overlay: Disabled",
-  "vexclient.screen.performance.placeholder_header": "Future performance panel (safe + informational)",
-  "vexclient.screen.performance.paragraph": "Vex Client alpha intentionally does not change vanilla performance yet.\n\nThis tab reserves space for thoughtful, ethical QoL overlays (education, diagnostics, and optional pacing hints\u2014not exploits).",
+
+  "vexclient.screen.performance.header": "Performance Tips",
+  "vexclient.screen.performance.placeholder_header": "Coming Soon",
+  "vexclient.screen.performance.paragraph": "Vex Client alpha intentionally does not change vanilla performance yet.\n\nThis tab reserves space for thoughtful, ethical QoL overlays — education, diagnostics, and optional pacing hints (not exploits).",
+
   "vexclient.screen.settings.title": "Settings",
-  "vexclient.screen.settings.config_path.header": "Config file",
-  "vexclient.screen.settings.hint": "Toggles autosave instantly to .minecraft/config as readable JSON.",
+  "vexclient.screen.settings.config_path.header": "Configuration File",
+  "vexclient.screen.settings.hint": "Settings auto-save instantly to your .minecraft/config folder as readable JSON.",
+
   "vexclient.title.overlay.headline": "VEX CLIENT",
-  "vexclient.title.overlay.subtitle": "Quality of Life \u2014 Alpha",
+  "vexclient.title.overlay.subtitle": "Quality of Life — Alpha",
   "vexclient.title.account_button": "Account",
+
   "vexclient.screen.login.title": "Vex Account",
   "vexclient.screen.login.sign_in": "Sign in with Microsoft",
-  "vexclient.screen.login.sign_out": "Sign out",
+  "vexclient.screen.login.sign_out": "Sign Out",
   "vexclient.screen.login.signed_in_as": "Signed in as",
   "vexclient.screen.login.not_signed_in": "Not signed in",
-  "vexclient.screen.login.waiting_browser": "Opening browser\u2026 complete sign-in, then return here.",
-  "vexclient.screen.login.success": "Signed in as %s",
-  "vexclient.screen.login.signed_out": "Signed out.",
+  "vexclient.screen.login.waiting_browser": "Opening browser… Complete sign-in to continue.",
+  "vexclient.screen.login.success": "Welcome, %s!",
+  "vexclient.screen.login.signed_out": "Successfully signed out.",
   "vexclient.screen.login.error.microsoft": "Microsoft login failed. Please try again.",
   "vexclient.screen.login.error.xbox": "Xbox authentication failed. Please try again.",
-  "vexclient.screen.login.error.not_owned": "Minecraft Java not owned on this Microsoft account.",
-  "vexclient.screen.login.error.expired": "Token expired, please sign in again."
+  "vexclient.screen.login.error.not_owned": "Minecraft Java Edition not found on this account.",
+  "vexclient.screen.login.error.expired": "Session expired. Please sign in again."
 }
