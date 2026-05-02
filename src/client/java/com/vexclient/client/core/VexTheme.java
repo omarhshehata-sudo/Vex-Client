@@ -185,5 +185,4 @@ public final class VexTheme {
 		return lerpColor(baseColor, pulseColor, t * 0.3f);
 	}
 }
-}
 
